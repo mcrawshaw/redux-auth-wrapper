@@ -11,12 +11,13 @@ const defaults = {
   wrapperDisplayName: 'AuthWrapper',
   predicate: x => !isEmpty(x),
   authenticatingSelector: () => false,
-  allowRedirectBack: true
+  allowRedirectBack: true,
+  EmptyComponent: () => null
 }
 
 export const UserAuthWrapper = (args) => {
   const { authSelector, authenticatingSelector, LoadingComponent, failureRedirectPath, FailureComponent,
-    wrapperDisplayName, predicate, allowRedirectBack, redirectAction, redirectQueryParamName } = {
+    wrapperDisplayName, predicate, allowRedirectBack, redirectAction, redirectQueryParamName, EmptyComponent } = {
       ...defaults,
       ...args
     }
@@ -129,11 +130,14 @@ export const UserAuthWrapper = (args) => {
           return <DecoratedComponent authData={authData} {...otherProps} />
         } else if(isAuthenticating) {
           return <LoadingComponent authData={authData} {...otherProps} />
-        } else {
+        } else if (FailureComponent) {
           // Display FailureComponent or nothing if FailureComponent is null
           // If FailureComponent is undefined user will never see this because
           // they will be redirected to failureRedirectPath
           return FailureComponent ? <FailureComponent authData={authData} {...otherProps} /> : null
+        }
+        else if (EmptyComponent) {
+          return EmptyComponent ? <EmptyComponent /> : null
         }
       }
     }
